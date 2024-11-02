@@ -1,6 +1,5 @@
-const express = require("express");
+ const express = require("express");
 const nodemailer = require("nodemailer");
-const Order = require("../models/Order");
 const router = express.Router();
 
 // Email configuration using Nodemailer
@@ -24,16 +23,16 @@ router.post("/send-order-confirmation", async (req, res) => {
         ${orderDetails
           .map(
             (item) =>
-              `<li>${item.name} (x${item.count}): ₹${item.price * item.count}</li>`
+              `<li>Product Name: ${item.name} (Quantity: ${item.count}): Price: ₹${item.price * item.count}</li>`
           )
           .join("")}
       </ul>
       <p><strong>Total Price:</strong> ₹${totalPrice}</p>
-      <h4>Delivery Address:</h4>
-      <p>${addressDetails.name}</p>
-      <p>${addressDetails.address}</p>
-      <p>${addressDetails.city}, ${addressDetails.state}, ${addressDetails.zipCode}</p>
-      <p>Phone: ${addressDetails.phone}</p>
+      <h4><strong>Delivery Address:</strong></h4>
+      <p><strong>Name:</strong> ${addressDetails.name}</p>
+      <p><strong>Address:</strong> ${addressDetails.address}</p>
+      <p><strong>City/Pincode:</strong> ${addressDetails.city}, ${addressDetails.state}, ${addressDetails.zipCode}</p>
+      <p><strong>Phone No:</strong> ${addressDetails.phone}</p>
     `;
   
     const sellerEmailContent = `
@@ -43,27 +42,28 @@ router.post("/send-order-confirmation", async (req, res) => {
         ${orderDetails
           .map(
             (item) =>
-              `<li>${item.name} (x${item.count}): ₹${item.price * item.count}</li>`
+              // `<li>${item.name} (x${item.count}): ₹${item.price * item.count}</li>`
+               `<li>Product Name: ${item.name} (Quantity: ${item.count}): Price: ₹${item.price * item.count}</li>`
           )
           .join("")}
       </ul>
       <p><strong>Total Price:</strong> ₹${totalPrice}</p>
-      <h4>Delivery Address:</h4>
-      <p>${addressDetails.name}</p>
-      <p>${addressDetails.address}</p>
-      <p>${addressDetails.city}, ${addressDetails.state}, ${addressDetails.zipCode}</p>
-      <p>Phone: ${addressDetails.phone}</p>
+      <h4><strong>Delivery Address:</h4>
+      <p><strong>Customer Name:</strong> ${addressDetails.name}</p>
+      <p><strong>Address:</strong> ${addressDetails.address}</p>
+      <p><strong>City/Pincode:</strong> ${addressDetails.city}, ${addressDetails.state}, ${addressDetails.zipCode}</p>
+      <p><strong>Phone No:</strong> ${addressDetails.phone}</p>
     `;
   
     try {
       // Save order to database
-      const order = await Order.create({
-        buyerEmail,
-        sellerEmail,
-        orderDetails,
-        totalPrice,
-        address: addressDetails, // Optionally, save address in your database if needed
-      });
+      // const order = await Order.create({
+      //   buyerEmail,
+      //   sellerEmail,
+      //   orderDetails,
+      //   totalPrice,
+      //   address: addressDetails, // Optionally, save address in your database if needed
+      // });
   
       // Send email to buyer
       await transporter.sendMail({
@@ -81,12 +81,13 @@ router.post("/send-order-confirmation", async (req, res) => {
         html: sellerEmailContent,
       });
   
+      
       res.status(200).send("Emails sent and order saved successfully");
     } catch (error) {
       console.error("Error sending emails or saving order:", error);
       res.status(500).send("Failed to send emails or save order");
     }
-  });
+});
   
 
 module.exports = router;

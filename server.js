@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
-const sequelize = require("./config/db");
 const orderRoutes = require("./routes/order");
 const app = express();
 app.use(bodyParser.json());
@@ -12,11 +11,6 @@ app.use(cors({
     credentials: true,  
 }));
 
-
-sequelize.sync().then(() => {
-    console.log("Database synced");
-});
-  
 app.use("/api/orders", orderRoutes);
 
 
