@@ -1,19 +1,11 @@
-const mongoose = require("mongoose");
+const admin = require("firebase-admin");
+// const serviceAccount = require("./firebaseServiceAccountKey.json");
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(
-      "mongodb+srv://contactfixitupinfo:Bk6v2ZxzSyUpcGjR@cluster0.rlluj.mongodb.net/",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
-    console.log("MongoDB connected successfully!");
-  } catch (err) {
-    console.error("MongoDB connection failed:", err.message);
-    process.exit(1); // Exit process with failure
-  }
-};
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://fixitup-be-1b89b.firebaseio.com",
+});
 
-module.exports = connectDB;
+const db = admin.firestore();
+
+module.exports = db;

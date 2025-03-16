@@ -1,8 +1,17 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
-const Order = require("../models/Order");
+const { getFirestore } = require("firebase-admin/firestore");
+const admin = require("firebase-admin");
 const router = express.Router();
 
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(require("../config/firebaseServiceAccountKey.json")),
+  });
+}
+
+const db = getFirestore();
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -14,22 +23,18 @@ const transporter = nodemailer.createTransport({
 router.post("/send-order-confirmation", async (req, res) => {
   const { buyerEmail, sellerEmail, orderDetails, totalPrice, addressDetails } = req.body;
   console.log(
-    "buyerEmail",
-    buyerEmail, 
-    "sellerEmail",
-    sellerEmail,
-    "orderDetails",
-    orderDetails,
-    "totalPrice",
-    totalPrice,
-    "addressDetails",
-    addressDetails
+    "buyerEmail", buyerEmail,
+    "sellerEmail", sellerEmail,
+    "orderDetails", orderDetails,
+    "totalPrice", totalPrice,
+    "addressDetails", addressDetails
   );
- // Define the email contents
+
+  // Define the email contents
   const buyerEmailContent = `
     <h3>Order Confirmation</h3>
     <p>Thank you for your purchase!</p>
-    <ul>${orderDetails.map(item => `<li>${item.name} (*${item.count}):  ₹${item.price * item.count}</li>`).join("")}</ul>
+    <ul>${orderDetails.map(item => `<li>${item.name} (*${item.count}): ₹${item.price * item.count}</li>`).join("")}</ul>
     <p><strong>Total Price:</strong> ₹${totalPrice}</p>
     <h4>Delivery Address:</h4>
     <p>${addressDetails.name}, ${addressDetails.address}, ${addressDetails.city}, ${addressDetails.state}, ${addressDetails.zipCode}, Phone: ${addressDetails.phone}</p>
@@ -44,15 +49,15 @@ router.post("/send-order-confirmation", async (req, res) => {
   `;
 
   try {
-    const order = new Order({
+    // Save order to Firestore
+    await db.collection("orders").add({
       buyerEmail,
       sellerEmail,
       orderDetails,
       totalPrice,
       addressDetails,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-
-    await order.save();
 
     // Send email to buyer
     await transporter.sendMail({
@@ -61,9 +66,8 @@ router.post("/send-order-confirmation", async (req, res) => {
       subject: "Order Confirmation",
       html: buyerEmailContent,
     });
-    
-    // Send email to seller
 
+    // Send email to seller
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: sellerEmail,
