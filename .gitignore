@@ -20,3 +20,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+# Ignore environment variables
+.env
+
+# Ignore Firebase private key
+/config/firebaseServiceAccountKey.json
+

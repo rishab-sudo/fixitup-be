@@ -1,0 +1,16 @@
+const functions = require("firebase-functions/v1");
+const express = require("express");
+// const cors = require("cors");
+const orderRoutes = require("./routes/order");
+const app = express();
+app.use(express.json());
+// app.use(cors({origin: ["http://your-frontend-url.com","http://localhost:3000"],methods:["GET", "POST", "PUT", "DELETE"],credentials: true}));
+app.use("/api/orders", orderRoutes);
+exports.api = functions.region("asia-south1").https.onRequest(app);
+// exports.api = functions.https.onRequest(app);
+// exports.api = functions.region("asia-south1").https.onRequest(app);
+// exports.api = functions.https.onRequest(app);
+// exports.api = functions.region("asia-south1").https.onRequest(app);
+// exports.api = functions.https.onRequest(app);
+// exports.api = functions.region("asia-south1").https.onRequest(app);
+// exports.api = functions.https.onRequest(app);

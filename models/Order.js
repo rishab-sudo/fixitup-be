@@ -1,34 +1,15 @@
-const mongoose = require("mongoose");
+const { db } = require("../functions/config/db"); // Correct import
 
-const OrderSchema = new mongoose.Schema({
-  buyerEmail: {
-    type: String,
-    required: true,
-  },
-  sellerEmail: {
-    type: String,
-    required: true,
-  },
-  orderDetails: [
-    {
-      name: String,
-      price: Number,
-      count: Number,
+class Order {
+  static async saveOrder(orderData) {
+    try {
+      const orderRef = db.collection("orders").doc();
+      await orderRef.set(orderData);
+      return orderRef.id;
+    } catch (error) {
+      throw new Error("Error saving order: " + error.message);
     }
-  ],
-  totalPrice: {
-    type: Number,
-    required: true,
-  },
-  addressDetails: {
-    name: String,
-    email: String,
-    phone: String,
-    address: String,
-    city: String,
-    state: String,
-    zipCode: String,
-  },
-});
+  }
+}
 
-module.exports = mongoose.model("Order", OrderSchema);
+module.exports = Order;
