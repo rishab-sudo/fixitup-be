@@ -21,7 +21,8 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: [
-      "https://fixitupkit.com",
+      // "https://fixitupkit.com",
+        "https://fixitupkit.com",
       "https://www.fixitupkit.com",
       "http://localhost:3000",
       "https://main.d269i1a354ml7x.amplifyapp.com",
